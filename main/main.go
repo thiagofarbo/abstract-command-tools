@@ -49,12 +49,10 @@ func main() {
 	}
 }
 
-// Função para executar comandos Git
 func runGitCommand(args ...string) {
 	runCommand("git", args...)
 }
 
-// Função para executar comandos do sistema
 func runCommand(name string, args ...string) {
 	cmd := exec.Command(name, args...)
 	output, err := cmd.CombinedOutput()
