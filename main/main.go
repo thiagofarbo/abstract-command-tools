@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"log"
@@ -8,15 +9,17 @@ import (
 	"os/exec"
 )
 
+type Answers struct {
+	Name  string
+	Age   int
+	Phone string
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Uso: ub <command> [args]")
 		return
 	}
-
-	// Capturar o comando passado como argumento
-	//cmd := os.Args[1]
-	//args := os.Args[2:]
 
 	cmd := os.Args[1]
 	var subCmd string
@@ -91,5 +94,32 @@ func runForm() {
 	if err != nil {
 		log.Fatalf("Error to fill up the form: %v", err)
 	}
-	fmt.Printf("Nome: %s\nIdade: %d\nTelefone: %s\n", answers.Name, answers.Age, answers.Phone)
+
+	answersText := Answers{
+		Name:  answers.Name,
+		Age:   answers.Age,
+		Phone: answers.Phone,
+	}
+
+	jsonData, err := json.MarshalIndent(answersText, "", "    ")
+	if err != nil {
+		fmt.Println("Erro ao codificar a struct em JSON:", err)
+		return
+	}
+	create(jsonData)
+}
+
+func create(text []byte) {
+	file, err := os.Create("answers.json")
+	if err != nil {
+		fmt.Printf("Erro ao criar arquivo: %v\n", err)
+		return
+	}
+	defer file.Close()
+
+	_, err = file.Write(text)
+	if err != nil {
+		fmt.Printf("Erro ao escrever no arquivo: %v\n", err)
+	}
+	fmt.Println("File created successfully")
 }
